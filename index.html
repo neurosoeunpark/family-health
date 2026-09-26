@@ -1,0 +1,1065 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F1F5F2">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>운동 복지</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏃</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+
+:root{
+  --bg:#F1F5F2; --paper:#FFFFFF; --ink:#1E2A2C; --muted:#6B7A78; --line:#DDE5E1;
+  --mom:#E4578B; --dad:#3D7BE0; --cert:#1FA37A; --gold:#E0A019; --couple:#E0455A; --off:#F7F9F8;
+  --band0:#FDECEE; --band1:#EAF1FD; --sun:#E0455A; --sat:#2F6FE0;
+  --radius-lg:22px; --radius-sm:12px;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131A1B; --paper:#1C2527; --ink:#E9EFEC; --muted:#93A29F; --line:#2C393B; --off:#172022;
+    --mom:#F07AA5; --dad:#6B9DF0; --cert:#3CC495; --gold:#F0B83C; --couple:#F07A8A;
+    --band0:#3A252B; --band1:#1F2C42; --sun:#F07A8A; --sat:#7FA6F2;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131A1B; --paper:#1C2527; --ink:#E9EFEC; --muted:#93A29F; --line:#2C393B; --off:#172022;
+  --mom:#F07AA5; --dad:#6B9DF0; --cert:#3CC495; --gold:#F0B83C; --couple:#F07A8A;
+    --band0:#3A252B; --band1:#1F2C42; --sun:#F07A8A; --sat:#7FA6F2;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{margin:0;background:var(--bg);color:var(--ink)}
+body{font-family:"Noto Sans KR",system-ui,-apple-system,"Apple SD Gothic Neo",sans-serif;font-size:15px;line-height:1.55;-webkit-tap-highlight-color:transparent}
+body.auth-locked .top,body.auth-locked .view,body.auth-locked nav.tabs{display:none}
+h1,h2,h3{font-family:inherit;font-weight:700;letter-spacing:-0.01em;margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--dad);outline-offset:2px}
+.wrap{max-width:520px;margin:0 auto;padding:16px 16px 110px}
+
+/* 상단 */
+.top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:4px 0 14px}
+.top h1{font-size:22px;line-height:1.2}
+.top small{display:block;color:var(--muted);font-size:12.5px;font-weight:400}
+.iconbtn{border:1px solid var(--line);background:var(--paper);border-radius:999px;width:40px;height:40px;display:grid;place-items:center;font-size:18px}
+
+/* 회차 네비 */
+.period{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.period .label{flex:1;text-align:center}
+.period .label b{display:block;font-weight:700;font-size:19px}
+.period .label span{color:var(--muted);font-size:13px}
+.period button{border:none;background:var(--paper);width:44px;height:44px;border-radius:14px;font-size:20px;border:1px solid var(--line)}
+.period button:disabled{opacity:.35;cursor:default}
+
+/* 달력 */
+.cal{background:var(--paper);border-radius:var(--radius-lg);padding:10px 6px 14px;border:1px solid var(--line)}
+.dow,.grid{display:grid;grid-template-columns:repeat(7,1fr)}
+.dow div{text-align:center;font-size:13px;color:var(--muted);padding:4px 0 10px}
+.dow div:first-child{color:var(--sun)}.dow div:last-child{color:var(--sat)}
+.grid{row-gap:10px;align-items:start}
+.cell{border:none;background:none;padding:0;margin:0;display:flex;flex-direction:column;align-items:stretch;gap:5px;min-height:62px}
+.cell .band{position:relative;height:40px;display:grid;place-items:center}
+.cell.p0 .band{background:var(--band0)}
+.cell.p1 .band{background:var(--band1)}
+.cell .band.s{border-radius:20px 0 0 20px;margin-left:3px}
+.cell .band.e{border-radius:0 20px 20px 0;margin-right:3px}
+.cell .band.s.e{border-radius:20px}
+.cell .n{font-size:18px;line-height:1}
+.cell.sun .n{color:var(--sun)}.cell.sat .n{color:var(--sat)}
+.cell.future .n{opacity:.4}
+.cell.today .n{font-weight:700;font-size:19px}
+.cell.off{pointer-events:none}
+.cell.off .n{opacity:.25}
+.cell .cdot{position:absolute;top:6px;right:7px;width:6px;height:6px;border-radius:50%;background:var(--cert)}
+.cell .bdot{position:absolute;left:50%;bottom:5px;width:7px;height:7px;border-radius:50%;background:var(--couple);transform:translateX(-50%)}
+.cell:not(.off):active .band{filter:brightness(.95)}
+.info{display:grid;gap:1px;justify-items:center;font-size:10.5px;line-height:1.3;font-variant-numeric:tabular-nums;letter-spacing:-.03em}
+.st{display:inline-flex;align-items:center;gap:2px;color:var(--muted);white-space:nowrap}
+.st i{width:6px;height:6px;border-radius:50%;border:1.5px solid currentColor;flex:none}
+.st.mom i{border-color:var(--mom)}.st.dad i{border-color:var(--dad)}
+.st.ok{color:var(--ink)}
+.st.ok.mom i{background:var(--mom);border-color:var(--mom)}.st.ok.dad i{background:var(--dad);border-color:var(--dad)}
+.payday{color:var(--sun);font-weight:700}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.dot.mom{background:var(--mom)}.dot.dad{background:var(--dad)}.dot.cert{background:var(--cert)}.dot.gold{background:var(--gold)}.dot.couple{background:var(--couple)}
+.dot.both{background:linear-gradient(90deg,var(--mom) 50%,var(--dad) 50%)}
+.dot.ring{background:none;border:1.5px solid var(--muted);width:8px;height:8px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;color:var(--muted);margin:14px 6px 0}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.legend .sw{width:18px;height:10px;border-radius:5px;display:inline-block}
+.chips{display:flex;gap:6px;margin-bottom:12px}
+.chips button{border:1px solid var(--line);background:var(--paper);border-radius:99px;padding:6px 12px;font-size:13px;display:inline-flex;align-items:center;gap:6px}
+.chips button i{width:10px;height:10px;border-radius:50%}
+.chips button[aria-pressed="true"]{border-color:var(--ink);font-weight:700}
+
+/* 이번 회차 요약 */
+.summary{margin-top:14px;background:var(--paper);border:1px solid var(--line);border-radius:var(--radius-lg);padding:16px}
+.summary h2{font-size:17px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:baseline}
+.summary h2 em{font-style:normal;font-weight:400;font-size:12.5px;color:var(--muted)}
+.person{margin-bottom:14px}
+.person .row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.person .who{display:flex;align-items:center;gap:6px;font-weight:500}
+.person .amt{font-weight:700}
+.bar{position:relative;height:10px;background:var(--off);border-radius:99px;border:1px solid var(--line)}
+.bar i{position:absolute;inset:0 auto 0 0;border-radius:99px}
+.bar .tick{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--line)}
+.ticks{position:relative;height:16px;font-size:10.5px;color:var(--muted)}
+.ticks span{position:absolute;transform:translateX(-50%);top:2px;white-space:nowrap}
+.ticks span:last-child{transform:translateX(-100%)}
+.hint{font-size:12.5px;color:var(--muted);margin-top:2px}
+.specials{border-top:1px dashed var(--line);padding-top:12px;display:grid;gap:10px}
+.bonus{border:1px solid var(--line);background:var(--off);border-radius:14px;padding:11px 12px}
+.bonus.on{background:var(--paper);border-color:color-mix(in srgb,var(--ink) 35%,var(--line))}
+.bonus .topline{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px}
+.bonus .k{display:flex;align-items:center;gap:7px;font-weight:700}
+.bonus .amt{font-weight:700;white-space:nowrap}
+.bonus .desc{font-size:12.5px;color:var(--muted);margin-top:-3px;margin-left:17px}
+.bonus .mini{height:8px;background:var(--paper);border:1px solid var(--line);border-radius:99px;overflow:hidden}
+.bonus .mini i{display:block;height:100%;border-radius:99px;background:var(--ink)}
+.bonus.couple .mini i{background:var(--couple)}
+.bonus.cert .mini i{background:var(--cert)}
+.bonus.long .mini i{background:var(--gold)}
+.bonus .meta{display:flex;justify-content:space-between;gap:8px;margin-top:6px;font-size:12px;color:var(--muted)}
+.bonus .meta b{color:var(--ink);font-weight:700}
+.total{margin-top:12px;padding-top:12px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:baseline}
+.total b{font-size:22px;font-weight:700}
+
+/* 정산 */
+.card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius-lg);padding:16px;margin-bottom:12px}
+.card h2{font-size:18px;margin-bottom:10px}
+.cap{margin:10px 0}
+.cap .row{display:flex;justify-content:space-between;font-size:13.5px;margin-bottom:5px}
+.cap.strong .row{font-weight:700;font-size:14px}
+.cap .bar i{background:var(--ink)}
+.cap-section{border-top:1px solid var(--line);margin:16px 0 6px;padding-top:13px;display:flex;justify-content:space-between;gap:10px;font-weight:700}
+.cap-section span:last-child{white-space:nowrap}
+.tbl-wrap{overflow-x:auto;margin:0 -4px}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:430px}
+th,td{padding:8px 6px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--muted);font-weight:500;font-size:12px}
+tr.now td{background:var(--off)}
+tfoot td{font-weight:700;border-bottom:none}
+.tag{font-size:11px;padding:1px 6px;border-radius:99px;border:1px solid var(--line);color:var(--muted);margin-left:4px}
+
+/* 갤러리 */
+.gallery-head{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin-bottom:12px}
+.gallery-head h2{font-size:18px;margin:0}
+.gallery-head p{font-size:13px;color:var(--muted);margin:2px 0 0}
+.gallery-count{font-size:12px;color:var(--muted);white-space:nowrap}
+.gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;border-radius:14px;overflow:hidden;background:var(--line)}
+.gallery-grid button{border:none;background:var(--off);padding:0;aspect-ratio:1;position:relative;overflow:hidden}
+.gallery-grid img{width:100%;height:100%;object-fit:cover;display:block}
+.gallery-grid time{position:absolute;left:6px;bottom:6px;background:rgba(7,17,18,.68);color:white;border-radius:999px;padding:2px 6px;font-size:11px}
+.empty-gallery{text-align:center;color:var(--muted);font-size:14px;padding:36px 10px;border:1px dashed var(--line);border-radius:16px;background:var(--off)}
+.photo-viewer{position:fixed;inset:0;background:rgba(7,17,18,.94);z-index:40;display:none;color:white}
+.photo-viewer.open{display:block}
+.photo-close{position:fixed;top:14px;right:14px;z-index:42;width:42px;height:42px;border:none;border-radius:999px;background:rgba(255,255,255,.16);color:white;font-size:24px}
+.photo-strip{height:100%;overflow-y:auto;scroll-snap-type:y mandatory}
+.photo-post{min-height:100vh;display:grid;align-content:center;gap:12px;padding:72px 18px 34px;scroll-snap-align:start}
+.photo-post img{width:100%;max-height:72vh;object-fit:contain;border-radius:16px;background:#111}
+.photo-meta{max-width:520px;width:100%;margin:0 auto;font-size:14px;color:rgba(255,255,255,.82)}
+.photo-meta b{display:block;color:white;font-size:16px;margin-bottom:4px}
+
+/* 설정 */
+.field{display:grid;gap:6px;margin:12px 0}
+.field label{font-size:13px;color:var(--muted)}
+.seg{display:grid;grid-template-columns:1fr 1fr;background:var(--off);border:1px solid var(--line);border-radius:14px;padding:4px;gap:4px}
+.seg button{border:none;background:none;border-radius:10px;padding:10px 0}
+.seg button[aria-pressed="true"]{background:var(--paper);box-shadow:0 1px 3px rgba(0,0,0,.12);font-weight:700}
+.btn{border:none;border-radius:14px;padding:13px 16px;font-weight:700;background:var(--ink);color:var(--paper);width:100%}
+.btn.ghost{background:var(--paper);color:var(--ink);border:1px solid var(--line);font-weight:500}
+.btn.danger{background:none;color:#C8413F;border:1px solid var(--line);font-weight:500}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+ol.steps{padding-left:20px;margin:6px 0 0;font-size:14px}
+ol.steps li{margin:4px 0}
+.note{font-size:13px;color:var(--muted)}
+.msg{font-size:13.5px;margin-top:8px;padding:10px 12px;border-radius:12px;background:var(--off);border:1px solid var(--line);display:none}
+.msg.show{display:block}
+.rules p{margin:6px 0;font-size:14px}
+
+/* 하단 탭 */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--paper);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);z-index:10}
+nav.tabs .in{max-width:520px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr)}
+body.has-admin nav.tabs .in{grid-template-columns:repeat(4,1fr)}
+nav.tabs button{border:none;background:none;padding:10px 0 12px;display:grid;justify-items:center;gap:2px;font-size:12px;color:var(--muted)}
+nav.tabs button span{font-size:20px;line-height:1}
+nav.tabs button[aria-selected="true"]{color:var(--ink);font-weight:700}
+.admin-tab{display:none!important}
+body.has-admin .admin-tab{display:grid!important}
+.view{display:none}.view.on{display:block}
+
+/* 입력 시트 */
+.sheet-bg{position:fixed;inset:0;background:rgba(10,20,20,.45);opacity:0;pointer-events:none;transition:opacity .2s;z-index:20}
+.sheet{position:fixed;left:0;right:0;bottom:0;max-width:520px;margin:0 auto;background:var(--paper);border-radius:24px 24px 0 0;padding:10px 18px calc(18px + env(safe-area-inset-bottom,0px));transform:translateY(105%);transition:transform .25s ease;z-index:21;max-height:92vh;overflow:auto}
+.open .sheet-bg{opacity:1;pointer-events:auto}
+.open .sheet{transform:none}
+.grab{width:40px;height:5px;border-radius:9px;background:var(--line);margin:0 auto 12px}
+.sheet h3{font-size:20px;margin-bottom:4px}
+.pbox{border:1px solid var(--line);border-radius:16px;padding:12px;margin:10px 0}
+.pbox .head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.pbox .head b{display:flex;align-items:center;gap:6px}
+.status{font-size:12.5px;color:var(--muted)}
+.status.ok{color:var(--cert);font-weight:700}
+input[type=number],textarea{width:100%;border:1px solid var(--line);background:var(--off);border-radius:12px;padding:12px;font-size:17px}
+textarea{font-size:14px;min-height:60px;resize:vertical}
+.chk{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:14px}
+.chk input{width:20px;height:20px;accent-color:var(--cert)}
+.step-read{border:1px solid var(--line);background:var(--off);border-radius:12px;padding:12px 14px;font-size:17px;font-variant-numeric:tabular-nums}
+.step-read.empty{color:var(--muted)}
+.proof-box{border:1px dashed var(--line);background:var(--off);border-radius:14px;padding:12px;margin-top:8px;font-size:13.5px;color:var(--muted)}
+.proof-box img{display:block;width:100%;max-height:220px;object-fit:cover;border-radius:12px;margin-top:8px}
+.proof-box input{margin-top:8px;width:100%}
+.firebase-status{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;font-size:13px;color:var(--muted)}
+.firebase-status b{color:var(--ink);font-weight:700}
+.firebase-status .pill{border:1px solid var(--line);border-radius:999px;padding:2px 8px;background:var(--off);white-space:nowrap}
+.auth-card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius-lg);padding:20px;margin-top:24px}
+body:not(.auth-locked) .auth-card{display:none}
+.auth-card h2{font-size:20px;margin-bottom:8px}
+.auth-card p{color:var(--muted);margin:0 0 14px}
+.auth-fields{display:grid;gap:8px;margin:12px 0}
+.auth-fields input{width:100%;border:1px solid var(--line);background:var(--off);border-radius:12px;padding:12px;font-size:15px}
+.auth-divider{display:flex;align-items:center;gap:10px;margin:14px 0;color:var(--muted);font-size:12px}
+.auth-divider::before,.auth-divider::after{content:"";height:1px;background:var(--line);flex:1}
+.auth-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.auth-user{font-size:12.5px;color:var(--muted);word-break:break-all;margin-top:10px}
+@media (prefers-reduced-motion: reduce){.sheet,.sheet-bg{transition:none}}
+
+</style>
+</head>
+<body class="auth-locked">
+<div class="wrap">
+  <section class="auth-card" id="authCard">
+    <h2>로그인이 필요합니다</h2>
+    <p>가족 운동 복지 기록은 로그인한 사용자만 볼 수 있습니다. 한 번 로그인하면 이 브라우저에 상태가 유지됩니다.</p>
+    <button class="btn" id="loginBtn">Google로 로그인</button>
+    <div class="auth-divider">또는</div>
+    <div class="auth-fields">
+      <input type="email" id="authEmail" autocomplete="email" placeholder="이메일">
+      <input type="password" id="authPassword" autocomplete="current-password" placeholder="비밀번호">
+      <div class="auth-actions">
+        <button class="btn ghost" id="emailLoginBtn">이메일 로그인</button>
+        <button class="btn ghost" id="logoutBtn" style="display:none">로그아웃</button>
+      </div>
+    </div>
+    <p>계정은 관리자가 미리 등록한 가족 계정만 사용할 수 있습니다.</p>
+    <div class="auth-user" id="authUser">로그인 준비 중</div>
+  </section>
+
+  <header class="top">
+    <h1>소영과 소은의<br>운동 복지<small>하루 5,000보 이상 걷기 달성 현황</small></h1>
+    <button class="iconbtn" id="goToday" aria-label="오늘로 이동">📅</button>
+  </header>
+
+  <section class="view on" id="v-cal" aria-label="달력">
+    <div class="period">
+      <button id="prev" aria-label="이전 달">‹</button>
+      <div class="label"><b id="pTitle"></b><span id="pRange"></span></div>
+      <button id="next" aria-label="다음 달">›</button>
+    </div>
+    <div class="cal">
+      <div class="dow"><div>일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div></div>
+      <div class="grid" id="grid"></div>
+      <div class="legend">
+        <span><i class="dot mom"></i>엄마</span>
+        <span><i class="dot dad"></i>아빠</span>
+        <span><i class="dot couple"></i>부부 공동 달성</span>
+        <span><i class="dot cert"></i>운동 인증</span>
+        <span><i class="sw" style="background:var(--band0)"></i><i class="sw" style="background:var(--band1)"></i>실적기간</span>
+      </div>
+    </div>
+    <div class="summary" id="summary"></div>
+  </section>
+
+  <section class="view" id="v-pay" aria-label="정산"></section>
+
+  <section class="view" id="v-gallery" aria-label="우리 가족 운동 갤러리"></section>
+
+  <section class="view" id="v-set" aria-label="기록 관리">
+    <div class="card">
+      <h2>기록 동기화</h2>
+      <p class="note">부모님 폰에서 자동 업로드된 걸음 수를 가져와 달력에 반영합니다.</p>
+      <div class="firebase-status"><span id="fbSyncText">연결 대기 중</span><span class="pill" id="fbSyncPill">기록 저장소</span></div>
+      <button class="btn ghost" id="fbSyncBtn" style="margin-top:10px">기록 새로고침</button>
+      <div class="msg" id="fbSyncMsg"></div>
+    </div>
+
+    <div class="card">
+      <h2>백업과 초기화</h2>
+      <p class="note">웹 화면의 수동 수정 기록은 이 브라우저에 저장됩니다. 다른 기기로 옮기려면 백업 파일을 사용하세요.</p>
+      <div class="btns" style="margin-top:10px">
+        <button class="btn ghost" id="expBtn">백업 내보내기</button>
+        <button class="btn ghost" id="bakBtn">백업 불러오기</button>
+      </div>
+      <input type="file" id="bakFile" accept=".json,application/json" hidden>
+      <div class="msg" id="bakMsg"></div>
+    </div>
+
+    <div class="card rules">
+      <h2>운영 규칙</h2>
+      <p>운영기간 2026. 9. 25. ~ 2027. 9. 24. / 실적기간 매월 25일~익월 24일 / 정산일 매월 25일</p>
+      <p>기본 인센티브: 10일 이상 5만 원, 15일 이상 6만 5천 원, 20일 이상 7만 5천 원. 부부 합산 월 최대 15만 원, 연간 180만 원 한도.</p>
+      <p>별도 인센티브: 부부 공동 달성, 운동 인증 참여, 장기 달성 항목을 정산합니다.</p>
+    </div>
+  </section>
+</div>
+
+<nav class="tabs" role="tablist">
+  <div class="in">
+    <button role="tab" aria-selected="true" data-v="v-cal"><span>📅</span>달력</button>
+    <button role="tab" aria-selected="false" data-v="v-pay"><span>💰</span>정산</button>
+    <button role="tab" aria-selected="false" data-v="v-gallery"><span>🖼️</span>갤러리</button>
+    <button class="admin-tab" role="tab" aria-selected="false" data-v="v-set"><span>⚙️</span>기록 관리</button>
+  </div>
+</nav>
+
+<div id="sheetRoot">
+  <div class="sheet-bg" id="sheetBg"></div>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sTitle">
+    <div class="grab"></div>
+    <h3 id="sTitle"></h3>
+    <div class="status" id="sSub"></div>
+    <div id="sBody"></div>
+    <div class="field">
+      <label for="sMemo">메모</label>
+      <textarea id="sMemo" placeholder="예: 공원 산책, 병원 왕복 등"></textarea>
+    </div>
+    <div class="btns">
+      <button class="btn ghost" id="sCancel">닫기</button>
+      <button class="btn" id="sSave">저장</button>
+    </div>
+  </div>
+</div>
+
+<div class="photo-viewer" id="photoViewer" aria-modal="true" role="dialog" aria-label="인증 사진 크게 보기">
+  <button class="photo-close" id="photoClose" aria-label="닫기">×</button>
+  <div class="photo-strip" id="photoStrip"></div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script>
+const CFG = {
+  start: '2026-09-25', end: '2027-09-24', periods: 12,
+  goal: 5000,
+  tiers: [[20, 75000], [15, 65000], [10, 50000]],
+  baseAnnual: 1800000,
+  couple: { days: 20, amt: 50000, cap: 200000 },
+  cert: { days: 5, amt: 20000, cap: 100000 },
+  long: { days: 15, every: 3, amt: 100000, cap: 300000 },
+  specialAnnual: 600000,
+};
+const PEOPLE = [{ id: 'mom', name: '엄마' }, { id: 'dad', name: '아빠' }];
+const KEY = 'walk-voucher-v1';
+let ADMIN_MODE = false;
+const FIREBASE_SYNC = {
+  projectId: 'familyhealth-76616',
+  apiKey: 'AIzaSyDI5cbjMgZHLrgVGipf10QeG5Nf2PpLxnM',
+  familyId: 'default',
+  members: [
+    { person: 'mom', memberId: '5be2929c2b72eaa2', label: '엄마' }
+  ],
+  auto: true,
+};
+const FIREBASE_APP_CONFIG = {
+  apiKey: FIREBASE_SYNC.apiKey,
+  authDomain: `${FIREBASE_SYNC.projectId}.firebaseapp.com`,
+  projectId: FIREBASE_SYNC.projectId,
+};
+let firebaseSyncing = false;
+let firebaseLastSync = null;
+let firebaseAuth = null;
+let currentUser = null;
+let currentUserRole = null;
+let accessAllowed = false;
+
+const pad = n => String(n).padStart(2, '0');
+const D = s => { const [y, m, d] = s.split('-').map(Number); return new Date(Date.UTC(y, m - 1, d)); };
+const S = d => d.toISOString().slice(0, 10);
+const addDays = (s, n) => { const d = D(s); d.setUTCDate(d.getUTCDate() + n); return S(d); };
+const todayStr = () => { const t = new Date(); return `${t.getFullYear()}-${pad(t.getMonth() + 1)}-${pad(t.getDate())}`; };
+const md = s => { const d = D(s); return `${d.getUTCMonth() + 1}. ${d.getUTCDate()}.`; };
+const won = n => n.toLocaleString('ko-KR') + '원';
+const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+function range(a, b) { const out = []; for (let s = a; s <= b; s = addDays(s, 1)) out.push(s); return out; }
+
+const PERIODS = Array.from({ length: CFG.periods }, (_, i) => {
+  const st = new Date(Date.UTC(2026, 8 + i, 25));
+  const en = new Date(Date.UTC(2026, 9 + i, 24));
+  return { idx: i, start: S(st), end: S(en), payday: S(new Date(Date.UTC(2026, 9 + i, 25))) };
+});
+const MONTHS = Array.from({ length: 13 }, (_, i) => { const d = new Date(Date.UTC(2026, 8 + i, 1)); return [d.getUTCFullYear(), d.getUTCMonth()]; });
+
+let state = load();
+function load() {
+  try { const raw = localStorage.getItem(KEY); if (raw) { const o = JSON.parse(raw); if (o && o.days) return o; } } catch (e) {}
+  return { days: {} };
+}
+function save() { state.updated = new Date().toISOString(); localStorage.setItem(KEY, JSON.stringify(state)); }
+const rec = (date, p) => state.days[date]?.[p] || {};
+const hit = (date, p) => (rec(date, p).steps || 0) >= CFG.goal;
+const dayRecord = date => state.days[date] || {};
+const proofOf = date => dayRecord(date).proof || null;
+const certedDay = date => !!proofOf(date);
+const coupleHit = date => PEOPLE.every(p => hit(date, p.id));
+
+function updateAuthUi(user, message = null) {
+  currentUser = user || null;
+  document.body.classList.toggle('auth-locked', !currentUser || !accessAllowed);
+  document.body.classList.toggle('has-admin', !!currentUser && accessAllowed && ADMIN_MODE);
+  if (!ADMIN_MODE && document.getElementById('v-set')?.classList.contains('on')) {
+    document.querySelectorAll('nav.tabs button').forEach(x => x.setAttribute('aria-selected', x.dataset.v === 'v-cal'));
+    document.querySelectorAll('.view').forEach(v => v.classList.toggle('on', v.id === 'v-cal'));
+  }
+  const userEl = document.getElementById('authUser');
+  const loginBtn = document.getElementById('loginBtn');
+  const logoutBtn = document.getElementById('logoutBtn');
+  if (loginBtn) loginBtn.style.display = currentUser ? 'none' : 'block';
+  if (logoutBtn) logoutBtn.style.display = currentUser ? 'block' : 'none';
+  if (userEl) {
+    if (message) userEl.textContent = message;
+    else {
+      userEl.textContent = currentUser
+        ? `로그인됨: ${currentUser.email || currentUser.displayName || currentUser.uid} / UID: ${currentUser.uid} / 권한: ${currentUserRole === 'admin' ? '관리자' : '조회'}`
+        : '로그인하면 기록을 불러옵니다.';
+    }
+  }
+}
+
+function setAuthMessage(message) {
+  const userEl = document.getElementById('authUser');
+  if (userEl) userEl.textContent = message;
+}
+
+async function requireIdToken({ allowLocked = false } = {}) {
+  if (!currentUser) throw new Error('로그인이 필요합니다.');
+  if (!allowLocked && !accessAllowed) throw new Error('가족 접근 권한이 필요합니다.');
+  return currentUser.getIdToken();
+}
+
+async function getFirestoreDocument(path, options = {}) {
+  const token = await requireIdToken(options);
+  const res = await fetch(fsUrl(path), {
+    cache: 'no-store',
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`기록 저장소 ${res.status}: ${(await res.text()).slice(0, 160)}`);
+  return res.json();
+}
+
+async function loadAllowedUser(user) {
+  currentUser = user || null;
+  currentUserRole = null;
+  accessAllowed = false;
+  ADMIN_MODE = false;
+  if (!user) {
+    updateAuthUi(null);
+    renderAll(false);
+    return;
+  }
+  updateAuthUi(user, '가족 접근 권한을 확인하는 중입니다...');
+  try {
+    const allowed = await getFirestoreDocument(`allowedUsers/${user.uid}`, { allowLocked: true });
+    if (!allowed) {
+      updateAuthUi(user, `접근 권한 없음. 관리자에게 UID 등록을 요청해 주세요. UID: ${user.uid}`);
+      renderAll(false);
+      return;
+    }
+    currentUserRole = String(fieldVal(allowed.fields?.role) || 'viewer').trim().toLowerCase();
+    ADMIN_MODE = currentUserRole === 'admin';
+    accessAllowed = true;
+    updateAuthUi(user);
+    renderAll(true);
+  } catch (error) {
+    updateAuthUi(user, `접근 권한 확인 실패: ${error.message}`);
+    renderAll(false);
+  }
+}
+
+function initAuth() {
+  const userEl = document.getElementById('authUser');
+  if (!window.firebase) {
+    if (userEl) userEl.textContent = '로그인 기능을 불러오지 못했습니다. 네트워크를 확인해 주세요.';
+    return;
+  }
+  firebase.initializeApp(FIREBASE_APP_CONFIG);
+  firebaseAuth = firebase.auth();
+  firebaseAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(error => {
+    if (userEl) userEl.textContent = `로그인 유지 설정 실패: ${error.message}`;
+  });
+  firebaseAuth.onAuthStateChanged(user => loadAllowedUser(user));
+  document.getElementById('loginBtn').onclick = async () => {
+    try {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      await firebaseAuth.signInWithPopup(provider);
+    } catch (error) {
+      setAuthMessage(`로그인 실패: ${error.message}`);
+    }
+  };
+  document.getElementById('emailLoginBtn').onclick = async () => {
+    const email = document.getElementById('authEmail').value.trim();
+    const password = document.getElementById('authPassword').value;
+    if (!email || !password) return setAuthMessage('이메일과 비밀번호를 입력해 주세요.');
+    try {
+      await firebaseAuth.signInWithEmailAndPassword(email, password);
+    } catch (error) {
+      setAuthMessage(`이메일 로그인 실패: ${error.message}`);
+    }
+  };
+  document.getElementById('logoutBtn').onclick = () => firebaseAuth.signOut();
+}
+function tier(days) { for (const [d, a] of CFG.tiers) if (days >= d) return a; return 0; }
+
+function compute() {
+  const today = todayStr();
+  const used = { base: 0, couple: 0, cert: 0, long: 0, special: 0 };
+  const longCount = { mom: 0, dad: 0 };
+  return PERIODS.map(pd => {
+    const dates = range(pd.start, pd.end);
+    const status = today > pd.end ? 'done' : today >= pd.start ? 'now' : 'future';
+    const r = { ...pd, status, per: {}, specials: [], base: 0, special: 0 };
+    let monthBase = 0;
+    for (const p of PEOPLE) {
+      const days = dates.filter(d => hit(d, p.id)).length;
+      const base = status === 'future' ? 0 : tier(days);
+      r.per[p.id] = { days, base, longCount: longCount[p.id], longSoFar: longCount[p.id] };
+      monthBase += base;
+    }
+    r.certDays = dates.filter(certedDay).length;
+    const basePay = Math.min(monthBase, CFG.baseAnnual - used.base);
+    used.base += basePay;
+    r.base = basePay;
+    const pay = (pool, cap, label, amt) => {
+      if (status === 'future') return;
+      const v = Math.max(0, Math.min(amt, cap - used[pool], CFG.specialAnnual - used.special));
+      used[pool] += v; used.special += v; r.special += v;
+      r.specials.push({ pool, label, amt: v, capped: v < amt });
+    };
+    if (PEOPLE.every(p => r.per[p.id].days >= CFG.couple.days)) pay('couple', CFG.couple.cap, '부부 공동 달성', CFG.couple.amt);
+    if (r.certDays >= CFG.cert.days) pay('cert', CFG.cert.cap, '운동 인증 참여', CFG.cert.amt);
+    for (const p of PEOPLE) {
+      if (r.per[p.id].days >= CFG.long.days && status !== 'future') {
+        longCount[p.id]++;
+        r.per[p.id].longCount = longCount[p.id];
+        if (longCount[p.id] % CFG.long.every === 0) pay('long', CFG.long.cap, `${p.name} 장기 달성 (${longCount[p.id]}개월)`, CFG.long.amt);
+      }
+      r.per[p.id].longSoFar = longCount[p.id];
+    }
+    r.total = r.base + r.special;
+    r.used = { ...used };
+    return r;
+  });
+}
+
+function currentPeriodIdx() {
+  const t = todayStr();
+  if (t < CFG.start) return 0;
+  const i = PERIODS.findIndex(p => t >= p.start && t <= p.end);
+  return i < 0 ? PERIODS.length - 1 : i;
+}
+function monthIdxOf(s) {
+  const d = D(s);
+  const i = MONTHS.findIndex(([y, m]) => y === d.getUTCFullYear() && m === d.getUTCMonth());
+  return i < 0 ? (s < CFG.start ? 0 : MONTHS.length - 1) : i;
+}
+const periodOf = d => PERIODS.findIndex(p => d >= p.start && d <= p.end);
+let curM = monthIdxOf(todayStr() < CFG.start ? CFG.start : todayStr());
+let selP = currentPeriodIdx();
+function stepLine(d, p) {
+  const s = rec(d, p).steps;
+  if (s === undefined) return '';
+  return `<span class="st ${p}${s >= CFG.goal ? ' ok' : ''}"><i></i>${s.toLocaleString('ko-KR')}</span>`;
+}
+function renderCal() {
+  const res = compute();
+  const today = todayStr();
+  const [y, m] = MONTHS[curM];
+  const first = S(new Date(Date.UTC(y, m, 1)));
+  const last = S(new Date(Date.UTC(y, m + 1, 0)));
+  document.getElementById('pTitle').textContent = `${y}년 ${m + 1}월`;
+  document.getElementById('prev').disabled = curM === 0;
+  document.getElementById('next').disabled = curM === MONTHS.length - 1;
+  const paydays = new Map(res.map(r => [r.payday, r]));
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  for (let i = 0; i < D(first).getUTCDay(); i++) grid.appendChild(document.createElement('div'));
+  const visible = [];
+  for (const d of range(first, last)) {
+    const dt = D(d), dow = dt.getUTCDay();
+    const pi = periodOf(d);
+    if (pi >= 0 && !visible.includes(pi)) visible.push(pi);
+    const pd = PERIODS[pi];
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'cell' + (pi >= 0 ? ` p${pi % 2}` : ' off') + (dow === 0 ? ' sun' : dow === 6 ? ' sat' : '') + (d === today ? ' today' : '') + (d > today ? ' future' : '');
+    const bandCls = pi >= 0 ? ['band', d === pd.start ? 's' : '', d === pd.end ? 'e' : ''].join(' ') : 'band';
+    const cert = certedDay(d);
+    const both = coupleHit(d);
+    const pay = paydays.get(d);
+    b.innerHTML = `<span class="${bandCls}"><span class="n">${dt.getUTCDate()}</span>${cert ? '<i class="cdot"></i>' : ''}${both ? '<i class="bdot"></i>' : ''}</span><span class="info">${stepLine(d, 'mom')}${stepLine(d, 'dad')}${pay ? '<span class="payday">정산</span>' : ''}</span>`;
+    if (pi >= 0) b.onclick = () => openSheet(d);
+    grid.appendChild(b);
+  }
+  if (!visible.includes(selP)) selP = visible.includes(currentPeriodIdx()) ? currentPeriodIdx() : (visible[0] ?? 0);
+  document.getElementById('pRange').textContent = '실적기간 ' + visible.map(i => `${md(PERIODS[i].start)}~${md(PERIODS[i].end)}`).join(' · ');
+  renderSummary(res[selP] || res[0], visible);
+}
+function renderSummary(r, visible = [r.idx]) {
+  const statusText = { done: '확정', now: '진행 중 · 예상 금액', future: '시작 전' }[r.status];
+  const personHTML = PEOPLE.map(p => {
+    const x = r.per[p.id];
+    const pct = Math.min(100, x.days / 20 * 100);
+    const next = CFG.tiers.slice().reverse().find(([d]) => x.days < d);
+    const hint = next ? `${next[0]}일 달성까지 ${next[0] - x.days}일 남았어요` : '최고 구간 달성!';
+    return `<div class="person"><div class="row"><span class="who"><i class="dot ${p.id}"></i>${p.name} · ${x.days}일</span><span class="amt">${won(x.base)}</span></div><div class="bar"><i style="width:${pct}%;background:var(--${p.id})"></i><span class="tick" style="left:50%"></span><span class="tick" style="left:75%"></span></div><div class="ticks"><span style="left:50%">10일</span><span style="left:75%">15일</span><span style="left:100%">20일</span></div><div class="hint">${hint}</div></div>`;
+  }).join('');
+  const got = pool => r.specials.filter(s => s.pool === pool).reduce((a, s) => a + s.amt, 0);
+  const bonusCard = ({ on, color, cls, title, amount, desc, pct, left, right }) => `
+    <div class="bonus ${cls} ${on ? 'on' : ''}">
+      <div class="topline">
+        <div><span class="k"><i class="dot ${color}"></i>${title}</span><div class="desc">${desc}</div></div>
+        <span class="amt">${amount}</span>
+      </div>
+      <div class="mini"><i style="width:${Math.max(0, Math.min(100, pct))}%"></i></div>
+      <div class="meta"><span>${left}</span><span>${right}</span></div>
+    </div>`;
+  const coupleMin = Math.min(...PEOPLE.map(p => r.per[p.id].days));
+  const coupleRemain = Math.max(0, CFG.couple.days - coupleMin);
+  const coupleAmount = got('couple');
+  const certAmount = got('cert');
+  const certRemain = Math.max(0, CFG.cert.days - r.certDays);
+  const longParts = PEOPLE.map(p => {
+    const soFar = r.per[p.id].longSoFar;
+    const cycle = soFar % CFG.long.every;
+    return { name: p.name, soFar, cycle, display: cycle === 0 && soFar > 0 ? CFG.long.every : cycle };
+  });
+  const longBest = Math.max(...longParts.map(x => x.display));
+  const longRemain = longParts.map(x => `${x.name} ${Math.max(0, CFG.long.every - x.display)}개월`).join(', ');
+  const specialsHTML = [
+    bonusCard({
+      on: coupleAmount > 0,
+      color: 'couple',
+      cls: 'couple',
+      title: '부부 공동 달성',
+      amount: coupleAmount ? won(coupleAmount) : '5만 원',
+      desc: '엄마와 아빠가 모두 20일 이상 달성하면 지급',
+      pct: coupleMin / CFG.couple.days * 100,
+      left: PEOPLE.map(p => `${p.name} ${r.per[p.id].days}/${CFG.couple.days}일`).join(' · '),
+      right: coupleRemain ? `${coupleRemain}일 남음` : '조건 달성'
+    }),
+    bonusCard({
+      on: certAmount > 0,
+      color: 'cert',
+      cls: 'cert',
+      title: '운동 인증',
+      amount: certAmount ? won(certAmount) : '2만 원',
+      desc: '사진 인증이 5일 이상이면 지급',
+      pct: r.certDays / CFG.cert.days * 100,
+      left: `운동 인증 ${r.certDays}/${CFG.cert.days}일`,
+      right: certRemain ? `${certRemain}일 남음` : '조건 달성'
+    }),
+    bonusCard({
+      on: got('long') > 0,
+      color: 'gold',
+      cls: 'long',
+      title: '장기 달성 누적',
+      amount: got('long') ? won(got('long')) : '10만 원',
+      desc: '15일 이상 달성한 달이 3개월 쌓일 때마다 지급',
+      pct: longBest / CFG.long.every * 100,
+      left: longParts.map(x => `${x.name} ${x.display}/${CFG.long.every}개월`).join(' · '),
+      right: got('long') ? '이번 회차 보상' : `${longRemain} 남음`
+    })
+  ].join('');
+  const chips = visible.length > 1 ? `<div class="chips">${visible.map(i => `<button type="button" data-p="${i}" aria-pressed="${i === r.idx}"><i style="background:var(--band${i % 2});border:1px solid var(--line)"></i>${i + 1}회차</button>`).join('')}</div>` : '';
+  document.getElementById('summary').innerHTML = `${chips}<h2>${r.idx + 1}회차 인센티브 <em>${statusText}</em></h2>${personHTML}<div class="specials">${specialsHTML}</div><div class="total"><span>${r.status === 'done' ? '정산 금액' : '예상 정산 금액'}</span><b>${won(r.total)}</b></div>`;
+  document.querySelectorAll('.chips button').forEach(b => b.onclick = () => { selP = +b.dataset.p; renderCal(); });
+}
+
+let sheetDate = null;
+let pendingProof = null;
+function openSheet(d) {
+  sheetDate = d;
+  pendingProof = null;
+  const dt = D(d);
+  const wk = '일월화수목금토'[dt.getUTCDay()];
+  document.getElementById('sTitle').textContent = `${dt.getUTCMonth() + 1}월 ${dt.getUTCDate()}일(${wk})`;
+  document.getElementById('sSub').textContent = `목표 ${CFG.goal.toLocaleString()}보 · 걸음 수는 자동 동기화 기준`;
+  document.getElementById('sBody').innerHTML = PEOPLE.map(p => {
+    const x = rec(d, p.id);
+    const steps = x.steps;
+    const body = ADMIN_MODE
+      ? `<input type="number" inputmode="numeric" min="0" step="1" id="in-${p.id}" placeholder="걸음 수" value="${steps ?? ''}">`
+      : `<div class="step-read ${steps === undefined ? 'empty' : ''}">${steps === undefined ? '기록 없음' : steps.toLocaleString('ko-KR') + '보'}</div>`;
+    return `<div class="pbox"><div class="head"><b><i class="dot ${p.id}"></i>${p.name}</b><span class="status ${hit(d, p.id) ? 'ok' : ''}" id="st-${p.id}">${hit(d, p.id) ? '달성' : '미달성'}</span></div>${body}</div>`;
+  }).join('') + renderProofBox(d);
+  if (ADMIN_MODE) PEOPLE.forEach(p => {
+    const inp = document.getElementById('in-' + p.id);
+    if (!inp) return;
+    inp.oninput = () => {
+      const ok = (parseInt(inp.value, 10) || 0) >= CFG.goal;
+      const st = document.getElementById('st-' + p.id);
+      st.textContent = ok ? '달성' : '미달성';
+      st.className = 'status' + (ok ? ' ok' : '');
+    };
+  });
+  const proofInput = document.getElementById('proofFile');
+  if (proofInput) proofInput.onchange = handleProofSelect;
+  document.getElementById('sMemo').value = state.days[d]?.memo || '';
+  document.getElementById('sheetRoot').classList.add('open');
+}
+function closeSheet() { document.getElementById('sheetRoot').classList.remove('open'); sheetDate = null; }
+document.getElementById('sheetBg').onclick = closeSheet;
+document.getElementById('sCancel').onclick = closeSheet;
+
+function renderProofBox(d) {
+  const proof = proofOf(d);
+  const preview = pendingProof || proof;
+  const image = preview?.dataUrl ? `<img src="${preview.dataUrl}" alt="운동 인증 사진">` : '';
+  const adminControls = ADMIN_MODE
+    ? `<input type="file" id="proofFile" accept="image/*"><div class="hint">사진은 하루에 1장만 저장됩니다.</div>`
+    : `<div class="hint">인증 사진은 관리자 화면에서만 등록할 수 있습니다.</div>`;
+  const title = preview ? '운동 인증 사진 등록됨' : '운동 인증 사진 없음';
+  return `<div class="proof-box"><b>${title}</b>${image}${adminControls}</div>`;
+}
+
+function galleryItems() {
+  return Object.entries(state.days)
+    .filter(([, day]) => day?.proof?.dataUrl)
+    .map(([date, day]) => ({ date, proof: day.proof, memo: day.memo || '' }))
+    .sort((a, b) => b.date.localeCompare(a.date) || String(b.proof.updatedAt || '').localeCompare(String(a.proof.updatedAt || '')));
+}
+
+function renderGallery() {
+  const root = document.getElementById('v-gallery');
+  if (!root) return;
+  const items = galleryItems();
+  if (!items.length) {
+    root.innerHTML = `<div class="card"><div class="gallery-head"><div><h2>우리 가족 운동 갤러리</h2></div><span class="gallery-count">0장</span></div><div class="empty-gallery">등록된 인증 사진이 없습니다.</div></div>`;
+    return;
+  }
+  const cells = items.map((item, idx) => `
+    <button type="button" data-photo="${idx}" aria-label="${escapeHtml(item.date)} 인증 사진 보기">
+      <img src="${item.proof.dataUrl}" alt="${escapeHtml(item.date)} 운동 인증 사진">
+      <time>${md(item.date)}</time>
+    </button>
+  `).join('');
+  root.innerHTML = `<div class="card"><div class="gallery-head"><div><h2>우리 가족 운동 갤러리</h2></div><span class="gallery-count">${items.length}장</span></div><div class="gallery-grid">${cells}</div></div>`;
+  root.querySelectorAll('[data-photo]').forEach(btn => {
+    btn.onclick = () => openPhotoViewer(Number(btn.dataset.photo || 0));
+  });
+}
+
+function openPhotoViewer(index = 0) {
+  const viewer = document.getElementById('photoViewer');
+  const strip = document.getElementById('photoStrip');
+  if (!viewer || !strip) return;
+  const items = galleryItems();
+  strip.innerHTML = items.map(item => `
+    <article class="photo-post">
+      <img src="${item.proof.dataUrl}" alt="${escapeHtml(item.date)} 운동 인증 사진">
+      <div class="photo-meta">
+        <b>${escapeHtml(md(item.date))} 운동 인증</b>
+        <span>${escapeHtml(item.memo || item.proof.name || '인증 사진')}</span>
+      </div>
+    </article>
+  `).join('');
+  viewer.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  requestAnimationFrame(() => {
+    const target = strip.children[index];
+    if (target) strip.scrollTop = target.offsetTop;
+  });
+}
+
+function closePhotoViewer() {
+  const viewer = document.getElementById('photoViewer');
+  if (viewer) viewer.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function compressImageFile(file, maxSize = 1200, quality = 0.72) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = reject;
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = reject;
+      img.onload = () => {
+        const scale = Math.min(1, maxSize / Math.max(img.width, img.height));
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.max(1, Math.round(img.width * scale));
+        canvas.height = Math.max(1, Math.round(img.height * scale));
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve({
+          name: file.name,
+          type: 'image/jpeg',
+          dataUrl: canvas.toDataURL('image/jpeg', quality),
+          updatedAt: new Date().toISOString()
+        });
+      };
+      img.src = String(reader.result || '');
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+async function handleProofSelect(e) {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  pendingProof = await compressImageFile(file);
+    if (sheetDate) {
+      const box = document.querySelector('.proof-box');
+      if (box) box.outerHTML = renderProofBox(sheetDate);
+      const proofInput = document.getElementById('proofFile');
+      if (proofInput) proofInput.onchange = handleProofSelect;
+    }
+}
+
+document.getElementById('sSave').onclick = async () => {
+  const d = sheetDate; if (!d) return;
+  const entry = { ...(state.days[d] || {}) };
+  if (ADMIN_MODE) {
+    for (const p of PEOPLE) {
+      const input = document.getElementById('in-' + p.id);
+      if (!input) continue;
+      const value = input.value.trim();
+      const item = { ...(entry[p.id] || {}) };
+      if (value === '') delete item.steps;
+      else item.steps = Math.max(0, parseInt(value, 10) || 0);
+      if (Object.keys(item).length) entry[p.id] = item;
+      else delete entry[p.id];
+    }
+  }
+  const memo = document.getElementById('sMemo').value.trim();
+  if (memo) entry.memo = memo; else delete entry.memo;
+  if (ADMIN_MODE && pendingProof) entry.proof = pendingProof;
+  if (Object.keys(entry).length) state.days[d] = entry; else delete state.days[d];
+  save();
+  try {
+    await saveAdminRecord(d, entry);
+    closeSheet();
+    renderAll(false);
+    if (ADMIN_MODE) syncFirebaseSteps({ silent: true });
+  } catch (error) {
+    alert(`저장 실패: ${error.message}`);
+  }
+};
+
+function renderPay() {
+  const res = compute();
+  const last = res.filter(r => r.status !== 'future').pop() || res[0];
+  const u = last.used;
+  const capRow = (label, v, cap, strong = false) => `<div class="cap ${strong ? 'strong' : ''}"><div class="row"><span>${label}</span><span>${won(v)} / ${won(cap)}</span></div><div class="bar"><i style="width:${Math.min(100, v / cap * 100)}%"></i></div></div>`;
+  const capSection = (label, v, cap) => `<div class="cap-section"><span>${label}</span><span>${won(v)} / ${won(cap)}</span></div>`;
+  const grand = res.reduce((a, r) => a + r.total, 0);
+  const rows = res.map(r => `<tr class="${r.status === 'now' ? 'now' : ''}"><td>${r.idx + 1}회차${r.status === 'now' ? '<span class="tag">진행 중</span>' : r.status === 'future' ? '<span class="tag">예정</span>' : ''}<br><small style="color:var(--muted)">${md(r.start)}~${md(r.end)}</small></td><td>${r.per.mom.days}일<br>${won(r.per.mom.base)}</td><td>${r.per.dad.days}일<br>${won(r.per.dad.base)}</td><td>${r.special ? won(r.special) : '-'}${r.specials.filter(s => s.amt).map(s => `<br><small style="color:var(--muted)">${s.label}</small>`).join('')}</td><td><b>${won(r.total)}</b></td></tr>`).join('');
+  document.getElementById('v-pay').innerHTML = `<div class="card"><h2>연간 한도 사용 현황</h2><p class="note">진행 중인 회차까지 포함한 예상 금액입니다. 총 한도 2,400,000원.</p>${capRow('기본 인센티브', u.base, CFG.baseAnnual, true)}${capSection('특별 인센티브', u.special, CFG.specialAnnual)}${capRow('부부 공동 달성', u.couple, CFG.couple.cap)}${capRow('운동 인증 참여', u.cert, CFG.cert.cap)}${capRow('장기 달성', u.long, CFG.long.cap)}</div><div class="card"><h2>회차별 정산</h2><div class="tbl-wrap"><table><thead><tr><th>회차</th><th>엄마</th><th>아빠</th><th>특별</th><th>합계</th></tr></thead><tbody>${rows}</tbody><tfoot><tr><td>합계</td><td></td><td></td><td>${won(u.special)}</td><td>${won(grand)}</td></tr></tfoot></table></div></div>`;
+}
+
+const fsUrl = path => `https://firestore.googleapis.com/v1/projects/${FIREBASE_SYNC.projectId}/databases/(default)/documents/${path}?key=${FIREBASE_SYNC.apiKey}`;
+const fieldVal = f => {
+  if (!f) return undefined;
+  if ('integerValue' in f) return Number(f.integerValue);
+  if ('doubleValue' in f) return Number(f.doubleValue);
+  if ('stringValue' in f) return f.stringValue;
+  if ('booleanValue' in f) return f.booleanValue;
+  if ('timestampValue' in f) return f.timestampValue;
+  return undefined;
+};
+const docId = name => (name || '').split('/').pop();
+const firestoreFields = data => {
+  const out = {};
+  for (const [key, value] of Object.entries(data)) {
+    if (value === undefined || value === null) continue;
+    if (typeof value === 'number') out[key] = Number.isInteger(value) ? { integerValue: String(value) } : { doubleValue: value };
+    else if (typeof value === 'boolean') out[key] = { booleanValue: value };
+    else out[key] = { stringValue: String(value) };
+  }
+  return out;
+};
+function setFirebaseMessage(text, show = true) {
+  const msg = document.getElementById('fbSyncMsg');
+  const txt = document.getElementById('fbSyncText');
+  if (txt) txt.textContent = text;
+  if (msg) { msg.textContent = text; msg.classList.toggle('show', show); }
+}
+async function listFirestore(path) {
+  const token = await requireIdToken();
+  const res = await fetch(fsUrl(path), {
+    cache: 'no-store',
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (!res.ok) throw new Error(`기록 저장소 ${res.status}: ${(await res.text()).slice(0, 160)}`);
+  const json = await res.json();
+  return json.documents || [];
+}
+async function patchFirestore(path, data) {
+  const token = await requireIdToken();
+  const res = await fetch(fsUrl(path), {
+    method: 'PATCH',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ fields: firestoreFields(data) })
+  });
+  if (!res.ok) throw new Error(`기록 저장소 ${res.status}: ${(await res.text()).slice(0, 160)}`);
+  return res.json();
+}
+
+async function saveAdminRecord(date, entry) {
+  if (!ADMIN_MODE) return;
+  if (!currentUser) throw new Error('관리자 저장은 로그인이 필요합니다.');
+  if (currentUserRole !== 'admin') throw new Error('관리자 권한이 필요합니다.');
+  const byPerson = new Map(FIREBASE_SYNC.members.map(m => [m.person, m.memberId]));
+  const jobs = [];
+  for (const p of PEOPLE) {
+    const memberId = byPerson.get(p.id);
+    if (!memberId) continue;
+    const steps = entry[p.id]?.steps;
+    const payload = {
+      date,
+      updatedAtMillis: Date.now(),
+      uploadedAtMillis: Date.now(),
+      source: 'admin_web',
+      memo: entry.memo || ''
+    };
+    if (steps !== undefined) payload.steps = steps;
+    if (entry.proof?.dataUrl) {
+      payload.proofDataUrl = entry.proof.dataUrl;
+      payload.proofName = entry.proof.name || '운동 인증 사진';
+      payload.proofUpdatedAt = entry.proof.updatedAt || new Date().toISOString();
+    }
+    jobs.push(patchFirestore(`families/${FIREBASE_SYNC.familyId}/members/${memberId}/stepRecords/${date}`, payload));
+  }
+  await Promise.all(jobs);
+}
+async function syncFirebaseSteps({ silent = false } = {}) {
+  if (!currentUser || !accessAllowed) return;
+  if (firebaseSyncing) return;
+  firebaseSyncing = true;
+  const btn = document.getElementById('fbSyncBtn');
+  const pill = document.getElementById('fbSyncPill');
+  if (btn) btn.disabled = true;
+  if (pill) pill.textContent = '동기화 중';
+  if (!silent) setFirebaseMessage('걸음 수 기록을 가져오는 중입니다.', true);
+  try {
+    const memberMap = new Map(FIREBASE_SYNC.members.map(m => [m.memberId, m]));
+    const memberDocs = await listFirestore(`families/${FIREBASE_SYNC.familyId}/members`);
+    const orderedMembers = memberDocs.map(d => docId(d.name)).sort();
+    orderedMembers.forEach((memberId, idx) => {
+      if (!memberMap.has(memberId) && PEOPLE[idx]) memberMap.set(memberId, { person: PEOPLE[idx].id, memberId, label: PEOPLE[idx].name });
+    });
+    let records = 0, changed = 0;
+    for (const memberId of orderedMembers) {
+      const mapping = memberMap.get(memberId);
+      if (!mapping?.person) continue;
+      const docs = await listFirestore(`families/${FIREBASE_SYNC.familyId}/members/${memberId}/stepRecords`);
+      for (const d of docs) {
+        const f = d.fields || {};
+        const date = fieldVal(f.date) || docId(d.name);
+        const steps = fieldVal(f.steps);
+        if (!date || !Number.isFinite(steps) || date < CFG.start || date > CFG.end) continue;
+        const day = state.days[date] || (state.days[date] = {});
+        const person = day[mapping.person] || (day[mapping.person] = {});
+        if (person.steps !== steps) { person.steps = steps; changed++; }
+        person.remoteMemberId = memberId;
+        person.remoteUpdatedAtMillis = fieldVal(f.updatedAtMillis) || fieldVal(f.uploadedAtMillis) || Date.now();
+        const proofUrl = fieldVal(f.proofUrl) || fieldVal(f.photoUrl);
+        const proofDataUrl = fieldVal(f.proofDataUrl);
+        if (proofUrl || proofDataUrl) {
+          const nextProof = {
+            dataUrl: proofDataUrl || proofUrl,
+            name: fieldVal(f.proofName) || '운동 인증 사진',
+            updatedAt: fieldVal(f.proofUpdatedAt) || new Date().toISOString()
+          };
+          if (JSON.stringify(day.proof || null) !== JSON.stringify(nextProof)) {
+            day.proof = nextProof;
+            changed++;
+          }
+        }
+        records++;
+      }
+    }
+    firebaseLastSync = new Date();
+    save();
+    renderAll(false);
+    const when = firebaseLastSync.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+    setFirebaseMessage(`기록 동기화 완료: ${records}건 확인, ${changed}건 반영 (${when})`, !silent || changed > 0);
+    if (pill) pill.textContent = '연결됨';
+  } catch (err) {
+    console.error(err);
+    setFirebaseMessage(`기록 동기화 실패: ${err.message}`, true);
+    if (pill) pill.textContent = '확인 필요';
+  } finally {
+    firebaseSyncing = false;
+    if (btn) btn.disabled = false;
+  }
+}
+
+function exportBackup() {
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `walk-voucher-backup-${todayStr()}.json`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+document.getElementById('expBtn').onclick = exportBackup;
+document.getElementById('bakBtn').onclick = () => document.getElementById('bakFile').click();
+document.getElementById('bakFile').onchange = async e => {
+  const f = e.target.files[0]; e.target.value = '';
+  const msg = document.getElementById('bakMsg');
+  if (!f) return;
+  try {
+    const o = JSON.parse(await f.text());
+    if (!o || typeof o.days !== 'object') throw new Error('bad backup');
+    state = o; save(); renderAll(false);
+    msg.textContent = `백업을 불러왔어요. (${Object.keys(o.days).length}일치 기록)`;
+  } catch { msg.textContent = '백업 파일 형식이 맞지 않습니다.'; }
+  msg.classList.add('show');
+};
+const fbSyncButton = document.getElementById('fbSyncBtn');
+if (fbSyncButton) fbSyncButton.onclick = () => syncFirebaseSteps();
+const photoCloseButton = document.getElementById('photoClose');
+if (photoCloseButton) photoCloseButton.onclick = closePhotoViewer;
+const photoViewer = document.getElementById('photoViewer');
+if (photoViewer) photoViewer.onclick = e => { if (e.target === photoViewer) closePhotoViewer(); };
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closePhotoViewer(); });
+
+document.querySelectorAll('nav.tabs button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('nav.tabs button').forEach(x => x.setAttribute('aria-selected', x === b));
+  document.querySelectorAll('.view').forEach(v => v.classList.toggle('on', v.id === b.dataset.v));
+  window.scrollTo(0, 0);
+});
+document.getElementById('prev').onclick = () => { if (curM > 0) { curM--; renderCal(); } };
+document.getElementById('next').onclick = () => { if (curM < MONTHS.length - 1) { curM++; renderCal(); } };
+document.getElementById('goToday').onclick = () => { curM = monthIdxOf(todayStr() < CFG.start ? CFG.start : todayStr()); selP = currentPeriodIdx(); document.querySelector('nav.tabs button').click(); renderCal(); };
+let sx = null;
+const cal = document.querySelector('.cal');
+cal.addEventListener('touchstart', e => { sx = e.touches[0].clientX; }, { passive: true });
+cal.addEventListener('touchend', e => {
+  if (sx === null) return;
+  const dx = e.changedTouches[0].clientX - sx; sx = null;
+  if (Math.abs(dx) > 60) (dx < 0 ? document.getElementById('next') : document.getElementById('prev')).click();
+});
+function renderAll(allowAutoSync = true) {
+  renderCal(); renderPay(); renderGallery();
+  if (allowAutoSync && FIREBASE_SYNC.auto) syncFirebaseSteps({ silent: true });
+}
+initAuth();
+renderAll(false);
+</script>
+</body>
+</html>
