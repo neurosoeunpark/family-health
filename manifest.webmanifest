@@ -1,0 +1,17 @@
+{
+  "name": "우리 가족 운동 갤러리",
+  "short_name": "운동 갤러리",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#F1F5F2",
+  "theme_color": "#F1F5F2",
+  "lang": "ko",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

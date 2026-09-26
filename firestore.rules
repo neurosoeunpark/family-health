@@ -1,0 +1,67 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function allowedUserPath() {
+      return /databases/$(database)/documents/allowedUsers/$(request.auth.uid);
+    }
+
+    function isAllowedFamilyUser() {
+      return signedIn() && exists(allowedUserPath());
+    }
+
+    function currentRole() {
+      return get(allowedUserPath()).data.role;
+    }
+
+    function isAdmin() {
+      return isAllowedFamilyUser() && currentRole() == 'admin';
+    }
+
+    function isAndroidAnonymousUploader() {
+      return signedIn()
+        && request.auth.token.firebase.sign_in_provider == 'anonymous';
+    }
+
+    function memberPath(familyId, memberId) {
+      return /databases/$(database)/documents/families/$(familyId)/members/$(memberId);
+    }
+
+    function ownsUploaderMember(familyId, memberId) {
+      return isAndroidAnonymousUploader()
+        && exists(memberPath(familyId, memberId))
+        && get(memberPath(familyId, memberId)).data.firebaseUid == request.auth.uid;
+    }
+
+    match /allowedUsers/{uid} {
+      allow read: if signedIn() && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    match /families/{familyId}/members/{memberId} {
+      allow read: if isAllowedFamilyUser();
+      allow create: if isAdmin()
+        || (isAndroidAnonymousUploader()
+          && request.resource.data.firebaseUid == request.auth.uid);
+      allow update: if isAdmin()
+        || ownsUploaderMember(familyId, memberId)
+        || (isAndroidAnonymousUploader()
+          && request.resource.data.firebaseUid == request.auth.uid);
+      allow delete: if isAdmin();
+
+      match /stepRecords/{date} {
+        allow read: if isAllowedFamilyUser();
+        allow create, update: if isAdmin() || ownsUploaderMember(familyId, memberId);
+        allow delete: if isAdmin();
+      }
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
