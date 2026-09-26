@@ -139,10 +139,12 @@ button{cursor:pointer}
 .card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius-lg);padding:16px;margin-bottom:12px}
 .card h2{font-size:18px;margin-bottom:10px}
 .cap{margin:10px 0}
+.budget-card .note{margin:0 0 12px;padding-left:8px}
+.budget-card .cap:first-of-type{margin-top:0}
 .cap .row{display:flex;justify-content:space-between;font-size:13.5px;margin-bottom:5px}
-.cap.strong .row{font-weight:700;font-size:14px}
+.cap.strong .row{font-weight:700;font-size:13.5px}
 .cap .bar i{background:var(--ink)}
-.cap-section{border-top:1px solid var(--line);margin:16px 0 6px;padding-top:13px;display:flex;justify-content:space-between;gap:10px;font-weight:700}
+.cap-section{border-top:1px solid var(--line);margin:16px 0 6px;padding-top:13px;display:flex;justify-content:space-between;gap:10px;font-weight:700;font-size:13.5px}
 .cap-section span:last-child{white-space:nowrap}
 .tbl-wrap{overflow-x:auto;margin:0 -4px}
 table{width:100%;border-collapse:collapse;font-size:13px;min-width:430px}
@@ -654,7 +656,6 @@ function renderSummary(r, visible = [r.idx]) {
     return { name: p.name, soFar, cycle, display: cycle === 0 && soFar > 0 ? CFG.long.every : cycle };
   });
   const longBest = Math.max(...longParts.map(x => x.display));
-  const longRemain = longParts.map(x => `${x.name} ${Math.max(0, CFG.long.every - x.display)}개월`).join(', ');
   const specialsHTML = [
     bonusCard({
       on: coupleAmount > 0,
@@ -686,8 +687,8 @@ function renderSummary(r, visible = [r.idx]) {
       amount: got('long') ? won(got('long')) : '10만 원',
       desc: '15일 이상 달성한 달이 연속 3개월이면 지급',
       pct: longBest / CFG.long.every * 100,
-      left: longParts.map(x => `${x.name} ${x.display}/${CFG.long.every}개월`).join(' · '),
-      right: got('long') ? '이번 회차 보상' : `${longRemain} 남음`
+      left: `장기 달성 누적 ${longBest}/${CFG.long.every}개월`,
+      right: ''
     })
   ].join('');
   const chips = visible.length > 1 ? `<div class="chips">${visible.map(i => `<button type="button" data-p="${i}" aria-pressed="${i === r.idx}"><i style="background:var(--band${i % 2});border:1px solid var(--line)"></i>${i + 1}회차</button>`).join('')}</div>` : '';
@@ -873,7 +874,7 @@ function renderPay() {
   const capSection = (label, v, cap) => `<div class="cap-section"><span>${label}</span><span>${won(v)} / ${won(cap)}</span></div>`;
   const grand = res.reduce((a, r) => a + r.total, 0);
   const rows = res.map(r => `<tr class="${r.status === 'now' ? 'now' : ''}"><td>${r.idx + 1}회차${r.status === 'now' ? '<span class="tag">진행 중</span>' : r.status === 'future' ? '<span class="tag">예정</span>' : ''}<br><small style="color:var(--muted)">${md(r.start)}~${md(r.end)}</small></td><td>${r.per.mom.days}일<br>${won(r.per.mom.base)}</td><td>${r.per.dad.days}일<br>${won(r.per.dad.base)}</td><td>${r.special ? won(r.special) : '-'}${r.specials.filter(s => s.amt).map(s => `<br><small style="color:var(--muted)">${s.label}</small>`).join('')}</td><td><b>${won(r.total)}</b></td></tr>`).join('');
-  document.getElementById('v-pay').innerHTML = `<div class="card"><h2>운동 복지 예산 현황</h2><p class="note">운동 복지 총 예산 2,400,000원</p>${capRow('기본 인센티브', u.base, CFG.baseAnnual, true)}${capSection('특별 인센티브', u.special, CFG.specialAnnual)}${capRow('부부 공동 달성', u.couple, CFG.couple.cap)}${capRow('운동 인증 참여', u.cert, CFG.cert.cap)}${capRow('장기 달성', u.long, CFG.long.cap)}</div><div class="card"><h2>회차별 정산</h2><div class="tbl-wrap"><table><thead><tr><th>회차</th><th>엄마</th><th>아빠</th><th>특별</th><th>합계</th></tr></thead><tbody>${rows}</tbody><tfoot><tr><td>합계</td><td></td><td></td><td>${won(u.special)}</td><td>${won(grand)}</td></tr></tfoot></table></div></div>`;
+  document.getElementById('v-pay').innerHTML = `<div class="card budget-card"><h2>운동 복지 예산 현황</h2><p class="note">운동 복지 총 예산 2,400,000원</p>${capRow('기본 인센티브', u.base, CFG.baseAnnual, true)}${capSection('특별 인센티브', u.special, CFG.specialAnnual)}${capRow('부부 공동 달성', u.couple, CFG.couple.cap)}${capRow('운동 인증 참여', u.cert, CFG.cert.cap)}${capRow('장기 달성', u.long, CFG.long.cap)}</div><div class="card"><h2>회차별 정산</h2><div class="tbl-wrap"><table><thead><tr><th>회차</th><th>엄마</th><th>아빠</th><th>특별</th><th>합계</th></tr></thead><tbody>${rows}</tbody><tfoot><tr><td>합계</td><td></td><td></td><td>${won(u.special)}</td><td>${won(grand)}</td></tr></tfoot></table></div></div>`;
 }
 
 const fsUrl = path => `https://firestore.googleapis.com/v1/projects/${FIREBASE_SYNC.projectId}/databases/(default)/documents/${path}?key=${FIREBASE_SYNC.apiKey}`;
