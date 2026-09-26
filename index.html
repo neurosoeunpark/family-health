@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#F1F5F2">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<title>운동 복지</title>
+<title>가족 운동 갤러리</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏃</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -50,6 +50,7 @@ button{cursor:pointer}
 .top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:4px 0 14px}
 .top h1{font-size:22px;line-height:1.2}
 .top small{display:block;color:var(--muted);font-size:12.5px;font-weight:400}
+.top-actions{display:flex;align-items:center;gap:8px}
 .iconbtn{border:1px solid var(--line);background:var(--paper);border-radius:999px;width:40px;height:40px;display:grid;place-items:center;font-size:18px}
 
 /* 회차 네비 */
@@ -156,19 +157,19 @@ tfoot td{font-weight:700;border-bottom:none}
 .gallery-head h2{font-size:18px;margin:0}
 .gallery-head p{font-size:13px;color:var(--muted);margin:2px 0 0}
 .gallery-count{font-size:12px;color:var(--muted);white-space:nowrap}
-.gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;border-radius:14px;overflow:hidden;background:var(--line)}
-.gallery-grid button{border:none;background:var(--off);padding:0;aspect-ratio:1;position:relative;overflow:hidden}
+.gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;background:none}
+.gallery-grid button{border:none;background:transparent;padding:0;aspect-ratio:1;position:relative;overflow:hidden}
 .gallery-grid img{width:100%;height:100%;object-fit:cover;display:block}
 .gallery-grid time{position:absolute;left:6px;bottom:6px;background:rgba(7,17,18,.68);color:white;border-radius:999px;padding:2px 6px;font-size:11px}
 .empty-gallery{text-align:center;color:var(--muted);font-size:14px;padding:36px 10px;border:1px dashed var(--line);border-radius:16px;background:var(--off)}
-.photo-viewer{position:fixed;inset:0;background:rgba(7,17,18,.94);z-index:40;display:none;color:white}
+.photo-viewer{position:fixed;inset:0;background:var(--bg);z-index:40;display:none;color:var(--ink)}
 .photo-viewer.open{display:block}
-.photo-close{position:fixed;top:14px;right:14px;z-index:42;width:42px;height:42px;border:none;border-radius:999px;background:rgba(255,255,255,.16);color:white;font-size:24px}
-.photo-strip{height:100%;overflow-y:auto;scroll-snap-type:y mandatory}
-.photo-post{min-height:100vh;display:grid;align-content:center;gap:12px;padding:72px 18px 34px;scroll-snap-align:start}
-.photo-post img{width:100%;max-height:72vh;object-fit:contain;border-radius:16px;background:#111}
-.photo-meta{max-width:520px;width:100%;margin:0 auto;font-size:14px;color:rgba(255,255,255,.82)}
-.photo-meta b{display:block;color:white;font-size:16px;margin-bottom:4px}
+.photo-close{position:fixed;top:14px;right:calc(50% - min(260px,50vw) + 16px);z-index:42;width:42px;height:42px;border:1px solid var(--line);border-radius:999px;background:var(--paper);color:var(--ink);font-size:24px}
+.photo-strip{height:100%;max-width:520px;margin:0 auto;overflow-y:auto;padding:66px 16px 100px}
+.photo-post{background:var(--paper);border:1px solid var(--line);margin-bottom:16px}
+.photo-post img{width:100%;height:auto;display:block;object-fit:contain;background:var(--paper)}
+.photo-meta{padding:12px 14px 14px;font-size:14px;color:var(--muted)}
+.photo-meta b{display:block;color:var(--ink);font-size:16px;margin-bottom:4px}
 
 /* 설정 */
 .field{display:grid;gap:6px;margin:12px 0}
@@ -223,14 +224,15 @@ textarea{font-size:14px;min-height:60px;resize:vertical}
 .firebase-status b{color:var(--ink);font-weight:700}
 .firebase-status .pill{border:1px solid var(--line);border-radius:999px;padding:2px 8px;background:var(--off);white-space:nowrap}
 .auth-card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius-lg);padding:20px;margin-top:24px}
+body.auth-locked .wrap{min-height:100vh;display:grid;align-content:center;padding-bottom:24px}
 body:not(.auth-locked) .auth-card{display:none}
-.auth-card h2{font-size:20px;margin-bottom:8px}
-.auth-card p{color:var(--muted);margin:0 0 14px}
-.auth-fields{display:grid;gap:8px;margin:12px 0}
+.auth-card h2{font-size:24px;margin-bottom:4px}
+.auth-card p{color:var(--muted);margin:0 0 18px;font-size:14px}
+.auth-fields{display:grid;gap:8px;margin:10px 0}
 .auth-fields input{width:100%;border:1px solid var(--line);background:var(--off);border-radius:12px;padding:12px;font-size:15px}
-.auth-divider{display:flex;align-items:center;gap:10px;margin:14px 0;color:var(--muted);font-size:12px}
+.auth-divider{display:flex;align-items:center;gap:10px;margin:16px 0 10px;color:var(--muted);font-size:12px}
 .auth-divider::before,.auth-divider::after{content:"";height:1px;background:var(--line);flex:1}
-.auth-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.auth-actions{display:grid;grid-template-columns:1fr;gap:8px}
 .auth-user{font-size:12.5px;color:var(--muted);word-break:break-all;margin-top:10px}
 @media (prefers-reduced-motion: reduce){.sheet,.sheet-bg{transition:none}}
 
@@ -239,10 +241,10 @@ body:not(.auth-locked) .auth-card{display:none}
 <body class="auth-locked">
 <div class="wrap">
   <section class="auth-card" id="authCard">
-    <h2>로그인이 필요합니다</h2>
-    <p>가족 운동 복지 기록은 로그인한 사용자만 볼 수 있습니다. 한 번 로그인하면 이 브라우저에 상태가 유지됩니다.</p>
-    <button class="btn" id="loginBtn">Google로 로그인</button>
-    <div class="auth-divider">또는</div>
+    <h2>가족 운동 갤러리</h2>
+    <p>가족 계정으로 로그인하세요.</p>
+    <button class="btn" id="loginBtn">Google로 계속하기</button>
+    <div class="auth-divider">이메일 로그인</div>
     <div class="auth-fields">
       <input type="email" id="authEmail" autocomplete="email" placeholder="이메일">
       <input type="password" id="authPassword" autocomplete="current-password" placeholder="비밀번호">
@@ -251,13 +253,15 @@ body:not(.auth-locked) .auth-card{display:none}
         <button class="btn ghost" id="logoutBtn" style="display:none">로그아웃</button>
       </div>
     </div>
-    <p>계정은 관리자가 미리 등록한 가족 계정만 사용할 수 있습니다.</p>
     <div class="auth-user" id="authUser">로그인 준비 중</div>
   </section>
 
   <header class="top">
     <h1>소영과 소은의<br>운동 복지<small>하루 5,000보 이상 걷기 달성 현황</small></h1>
-    <button class="iconbtn" id="goToday" aria-label="오늘로 이동">📅</button>
+    <div class="top-actions">
+      <button class="iconbtn" id="goToday" aria-label="오늘로 이동">📅</button>
+      <button class="iconbtn" id="topLogoutBtn" aria-label="로그아웃">↪</button>
+    </div>
   </header>
 
   <section class="view on" id="v-cal" aria-label="달력">
@@ -289,7 +293,7 @@ body:not(.auth-locked) .auth-card{display:none}
       <h2>기록 동기화</h2>
       <p class="note">부모님 폰에서 자동 업로드된 걸음 수를 가져와 달력에 반영합니다.</p>
       <div class="firebase-status"><span id="fbSyncText">연결 대기 중</span><span class="pill" id="fbSyncPill">기록 저장소</span></div>
-      <button class="btn ghost" id="fbSyncBtn" style="margin-top:10px">기록 새로고침</button>
+      <button class="btn ghost" id="fbSyncBtn" style="margin-top:10px">업데이트</button>
       <div class="msg" id="fbSyncMsg"></div>
     </div>
 
@@ -516,7 +520,9 @@ function initAuth() {
       setAuthMessage(`이메일 로그인 실패: ${error.message}`);
     }
   };
-  document.getElementById('logoutBtn').onclick = () => firebaseAuth.signOut();
+  const signOut = () => firebaseAuth.signOut();
+  document.getElementById('logoutBtn').onclick = signOut;
+  document.getElementById('topLogoutBtn').onclick = signOut;
 }
 function tier(days) { for (const [d, a] of CFG.tiers) if (days >= d) return a; return 0; }
 
@@ -850,7 +856,6 @@ document.getElementById('sSave').onclick = async () => {
     await saveAdminRecord(d, entry);
     closeSheet();
     renderAll(false);
-    if (ADMIN_MODE) syncFirebaseSteps({ silent: true });
   } catch (error) {
     alert(`저장 실패: ${error.message}`);
   }
