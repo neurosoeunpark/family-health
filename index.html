@@ -372,7 +372,8 @@ const FIREBASE_SYNC = {
   apiKey: 'AIzaSyDI5cbjMgZHLrgVGipf10QeG5Nf2PpLxnM',
   familyId: 'default',
   members: [
-    { person: 'mom', memberId: '5be2929c2b72eaa2', label: '엄마' }
+    { person: 'mom', memberId: '5be2929c2b72eaa2', label: '엄마' },
+    { person: 'dad', memberId: '48dec6a3d4fbe7a5', label: '아빠' }
   ],
   auto: true,
 };
@@ -968,8 +969,11 @@ async function syncFirebaseSteps({ silent = false } = {}) {
     const memberMap = new Map(FIREBASE_SYNC.members.map(m => [m.memberId, m]));
     const memberDocs = await listFirestore(`families/${FIREBASE_SYNC.familyId}/members`);
     const orderedMembers = memberDocs.map(d => docId(d.name)).sort();
-    orderedMembers.forEach((memberId, idx) => {
-      if (!memberMap.has(memberId) && PEOPLE[idx]) memberMap.set(memberId, { person: PEOPLE[idx].id, memberId, label: PEOPLE[idx].name });
+    orderedMembers.forEach(memberId => {
+      if (memberMap.has(memberId)) return;
+      const usedPeople = new Set([...memberMap.values()].map(m => m.person));
+      const nextPerson = PEOPLE.find(p => !usedPeople.has(p.id));
+      if (nextPerson) memberMap.set(memberId, { person: nextPerson.id, memberId, label: nextPerson.name });
     });
     let records = 0, changed = 0;
     for (const memberId of orderedMembers) {
