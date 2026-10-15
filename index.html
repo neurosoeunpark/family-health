@@ -551,7 +551,7 @@ function tier(days) { for (const [d, a] of CFG.tiers) if (days >= d) return a; r
 function compute() {
   const today = todayStr();
   const used = { base: 0, couple: 0, cert: 0, long: 0, special: 0 };
-  const longCount = { mom: 0, dad: 0 };
+  let longCount = 0;
   return PERIODS.map(pd => {
     const dates = range(pd.start, pd.end);
     const status = today > pd.end ? 'done' : today >= pd.start ? 'now' : 'future';
@@ -560,7 +560,7 @@ function compute() {
     for (const p of PEOPLE) {
       const days = dates.filter(d => hit(d, p.id)).length;
       const base = status === 'future' ? 0 : tier(days);
-      r.per[p.id] = { days, base, longCount: longCount[p.id], longSoFar: longCount[p.id] };
+      r.per[p.id] = { days, base };
       monthBase += base;
     }
     r.certDays = dates.filter(certedDay).length;
@@ -575,17 +575,15 @@ function compute() {
     };
     if (PEOPLE.every(p => r.per[p.id].days >= CFG.couple.days)) pay('couple', CFG.couple.cap, '부부 공동 달성', CFG.couple.amt);
     if (r.certDays >= CFG.cert.days) pay('cert', CFG.cert.cap, '운동 인증 참여', CFG.cert.amt);
-    for (const p of PEOPLE) {
-      if (r.per[p.id].days >= CFG.long.days && status !== 'future') {
-        longCount[p.id]++;
-        r.per[p.id].longCount = longCount[p.id];
-        if (longCount[p.id] % CFG.long.every === 0) pay('long', CFG.long.cap, `${p.name} 장기 달성 (${longCount[p.id]}개월)`, CFG.long.amt);
+    if (status !== 'future') {
+      if (PEOPLE.every(p => r.per[p.id].days >= CFG.long.days)) {
+        longCount++;
+        if (longCount % CFG.long.every === 0) pay('long', CFG.long.cap, `부부 공동 장기 달성 (${longCount}개월)`, CFG.long.amt);
       } else if (status === 'done') {
-        longCount[p.id] = 0;
-        r.per[p.id].longCount = 0;
+        longCount = 0;
       }
-      r.per[p.id].longSoFar = longCount[p.id];
     }
+    r.longSoFar = longCount;
     r.total = r.base + r.special;
     r.used = { ...used };
     return r;
@@ -669,12 +667,8 @@ function renderSummary(r, visible = [r.idx]) {
   const coupleAmount = got('couple');
   const certAmount = got('cert');
   const certRemain = Math.max(0, CFG.cert.days - r.certDays);
-  const longParts = PEOPLE.map(p => {
-    const soFar = r.per[p.id].longSoFar;
-    const cycle = soFar % CFG.long.every;
-    return { name: p.name, soFar, cycle, display: cycle === 0 && soFar > 0 ? CFG.long.every : cycle };
-  });
-  const longBest = Math.max(...longParts.map(x => x.display));
+  const longCycle = r.longSoFar % CFG.long.every;
+  const longBest = longCycle === 0 && r.longSoFar > 0 ? CFG.long.every : longCycle;
   const specialsHTML = [
     bonusCard({
       on: coupleAmount > 0,
@@ -693,7 +687,7 @@ function renderSummary(r, visible = [r.idx]) {
       cls: 'cert',
       title: '운동 인증',
       amount: certAmount ? won(certAmount) : '2만 원',
-      desc: '사진 인증이 5일 이상이면 지급',
+      desc: '둘이 함께 나온 사진 인증이 5일 이상이면 지급',
       pct: r.certDays / CFG.cert.days * 100,
       left: `운동 인증 ${r.certDays}/${CFG.cert.days}일`,
       right: certRemain ? `${certRemain}일 남음` : '조건 달성'
@@ -702,11 +696,11 @@ function renderSummary(r, visible = [r.idx]) {
       on: got('long') > 0,
       color: 'gold',
       cls: 'long',
-      title: '장기 달성 누적',
+      title: '부부 공동 장기 달성',
       amount: got('long') ? won(got('long')) : '10만 원',
-      desc: '15일 이상 달성한 달이 연속 3개월이면 지급',
+      desc: '엄마와 아빠가 모두 15일 이상 달성한 달이 연속 3개월이면 지급',
       pct: longBest / CFG.long.every * 100,
-      left: `장기 달성 누적 ${longBest}/${CFG.long.every}개월`,
+      left: `부부 공동 장기 달성 누적 ${longBest}/${CFG.long.every}개월`,
       right: ''
     })
   ].join('');
