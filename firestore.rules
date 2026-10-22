@@ -47,9 +47,13 @@ service cloud.firestore {
       allow create: if isAdmin()
         || (isAndroidAnonymousUploader()
           && request.resource.data.firebaseUid == request.auth.uid);
+      // 이미 주인(firebaseUid)이 있는 가족 문서는 그 주인 폰이나 관리자만 고칠 수 있음.
+      // 주인이 비어 있는 문서만 처음 연결하는 폰이 차지할 수 있음.
       allow update: if isAdmin()
-        || ownsUploaderMember(familyId, memberId)
+        || (ownsUploaderMember(familyId, memberId)
+          && request.resource.data.firebaseUid == request.auth.uid)
         || (isAndroidAnonymousUploader()
+          && !('firebaseUid' in resource.data)
           && request.resource.data.firebaseUid == request.auth.uid);
       allow delete: if isAdmin();
 
