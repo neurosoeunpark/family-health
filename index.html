@@ -917,14 +917,22 @@ function setFirebaseMessage(text, show = true) {
   if (msg) { msg.textContent = text; msg.classList.toggle('show', show); }
 }
 async function listFirestore(path) {
+  // Firestore는 목록을 여러 페이지로 나눠 돌려주므로 마지막 페이지까지 모두 읽음
   const token = await requireIdToken();
-  const res = await fetch(fsUrl(path), {
-    cache: 'no-store',
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  if (!res.ok) throw new Error(`기록 저장소 ${res.status}: ${(await res.text()).slice(0, 160)}`);
-  const json = await res.json();
-  return json.documents || [];
+  const all = [];
+  let pageToken = '';
+  do {
+    const url = fsUrl(path) + '&pageSize=300' + (pageToken ? `&pageToken=${encodeURIComponent(pageToken)}` : '');
+    const res = await fetch(url, {
+      cache: 'no-store',
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (!res.ok) throw new Error(`기록 저장소 ${res.status}: ${(await res.text()).slice(0, 160)}`);
+    const json = await res.json();
+    all.push(...(json.documents || []));
+    pageToken = json.nextPageToken || '';
+  } while (pageToken);
+  return all;
 }
 async function patchFirestore(path, data) {
   const token = await requireIdToken();
